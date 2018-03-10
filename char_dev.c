@@ -14,9 +14,8 @@ static int __init char_dev_init(void)
 }
 module_init(char_dev_init);
 
-static int __exit char_dev_exit(void)
+static void __exit char_dev_exit(void)
 {
 	printk(KERN_INFO"char dev driver exit!\n");
-	return 0;
 }
 module_exit(char_dev_exit);

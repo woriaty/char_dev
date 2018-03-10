@@ -3,7 +3,7 @@ SRC = $(wildcard*.o)
 
 KERNEL_HEARDERS_HATH = /usr/src/linux-headers-$(KVERS)
 
-obj-m += $(SRC)
+obj-m += char_dev.o
 
 build: kernel_modules
 
