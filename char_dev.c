@@ -19,4 +19,4 @@ static int __exit char_dev_exit(void)
 	printk(KERN_INFO"char dev driver exit!\n");
 	return 0;
 }
-module_exit(char_dev_init);
+module_exit(char_dev_exit);
