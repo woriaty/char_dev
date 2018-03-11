@@ -14,6 +14,9 @@ struct my_char_dev{
 int char_dev_major = MY_DEV_MAJOR;
 struct my_char_dev *char_devp;
 
+MODULE_AUTHOR("woriaty");
+MODULE_LICENSE("GPL v2");
+
 static ssize_t char_dev_read(struct file *filp,const char __user *buf,
 	size_t count,loff_t *f_pos)
 {
@@ -45,12 +48,12 @@ static int char_dev_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-struct file_operations char_dev_ops{
-	.owner   = THIS_MODULE;
-	.read    = char_dev_read;
-	.write   = char_dev_write;
-	.open    = char_dev_open;
-	.release = char_dev_release;
+struct file_operations char_dev_ops = {
+	.owner   = THIS_MODULE,
+	.read    = char_dev_read,
+	.write   = char_dev_write,
+	.open    = char_dev_open,
+	.release = char_dev_release,
 };
 
 static void char_dev_setup(struct my_char_dev *dev, int index)
@@ -75,7 +78,7 @@ static int __init char_dev_init(void)
 	}
 	if(err < 0)
 		return err;
-	char_devp = kmalloc(sizeof(my_char_dev),0);
+	char_devp = kmalloc(sizeof(struct my_char_dev),0);
 	if(!char_devp){
 		printk(KERN_INFO"No memory for dev!\n");
 		goto fail_malloc;
@@ -85,14 +88,14 @@ static int __init char_dev_init(void)
 	printk(KERN_INFO"char dev driver init!\n");
 	return 0;
 fail_malloc:
-	unregister_chrdev_region(dev,1,"my char dev");
+	unregister_chrdev_region(devno,1);
 	return -ENOMEM;
 }
 module_init(char_dev_init);
 
 static void __exit char_dev_exit(void)
 {
-	cdev_del(char_devp);
+	cdev_del(&char_devp->dev);
 	kfree(char_devp);
 	unregister_chrdev_region(MKDEV(char_dev_major,0),1);
 	printk(KERN_INFO"char dev driver exit!\n");
