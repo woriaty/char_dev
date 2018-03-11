@@ -38,6 +38,7 @@ static ssize_t char_dev_write(struct file *filp,const char __user *buf,
 
 static int char_dev_open(struct inode *inode, struct file *filp)
 {
+	filp->private_data = char_devp;
 	printk(KERN_INFO"Open char dev\n");
 	return 0;
 }
