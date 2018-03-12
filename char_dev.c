@@ -43,6 +43,21 @@ static int char_dev_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
+static long char_dev_ioctl(struct file *filp, unsigned int cmd, 
+	unsigned long count)
+{
+	filp->private_data = char_devp;
+	switch(cmd){
+		case 0: printk(KERN_INFO"cmd 0\n");break;
+		case 1: printk(KERN_INFO"cmd 1\n");break;
+		case 2: printk(KERN_INFO"cmd 2\n");break;
+		case 3: printk(KERN_INFO"cmd 3\n");break;
+		default:break;
+	}
+	printk(KERN_INFO"count = %ld\n",count);
+	return 1;
+}
+
 static int char_dev_release(struct inode *inode, struct file *filp)
 {
 	printk(KERN_INFO"Realse char dev\n");
@@ -53,6 +68,7 @@ struct file_operations char_dev_ops = {
 	.owner   = THIS_MODULE,
 	.read    = char_dev_read,
 	.write   = char_dev_write,
+	.unlocked_ioctl = char_dev_ioctl,
 	.open    = char_dev_open,
 	.release = char_dev_release,
 };
