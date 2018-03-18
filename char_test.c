@@ -6,12 +6,13 @@
 #include <linux/slab.h>
 
 #define TEST_MAJOR  234
+#define CHAR_DEV_NAME "my char dev"
 
 
-unsigned in char_test_major = 234;
+unsigned int char_test_major = TEST_MAJOR;
 
 MODULE_AUTHOR("Jianjun Wang");
-MODULE_LINCENSE("GPL v2");
+MODULE_LICENSE("GPL v2");
 
 ssize_t char_test_read(struct file *filp, char __user *buf, size_t count,
 	loff_t *f_pos)
@@ -23,7 +24,7 @@ ssize_t char_test_write(struct file *filp, char __user *buf, size_t count,
 	loff_t *f_pos)
 {
 	printk("%s\n",__func__);
-	return count;
+	return 0;
 }
 
 long char_test_ioctl(struct file *filp, unsigned int cmd, 
@@ -35,31 +36,31 @@ long char_test_ioctl(struct file *filp, unsigned int cmd,
 int char_test_open(struct inode *inode, struct file *filp)
 {
 	printk("%s\n",__func__);
-	return 1;
+	return 0;
 }
 
 int char_test_release(struct inode *inode, struct file *filp)
 {
 	printk("%s\n",__func__);
-	return 1;
+	return 0;
 }
 
 
 
 struct file_operations char_test_ops = {
-	.owner = THIS_MODULE;
-	.read  = char_test_read;
-	.write = char_test_write;
-	.unlocked_ioctl = char_test_ioctl;
-	.open  = char_test_open;
-	.release = char_test_release;
+	.owner = THIS_MODULE,
+	.read  = char_test_read,
+	.write = char_test_write,
+	.unlocked_ioctl = char_test_ioctl,
+	.open  = char_test_open,
+	.release = char_test_release,
 };
 
 static int __init char_test_init(void)
 {
 	int ret;
 	printk("%s\n",__func__);
-	ret = register_chrdev(char_test_major,"char_test_dev",&char_test_ops);
+	ret = register_chrdev(char_test_major,CHAR_DEV_NAME,&char_test_ops);
 	if(ret){
 		printk("Can't register char device %d\n",char_test_major);
 		return ret;
@@ -70,6 +71,7 @@ module_init(char_test_init);
 
 static void __exit char_test_exit(void)
 {
+	unregister_chrdev(char_test_major,CHAR_DEV_NAME);
 	printk("%s\n",__func__);
 }
 module_exit(char_test_exit);
