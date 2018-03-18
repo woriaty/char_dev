@@ -5,11 +5,9 @@
 #include <linux/uaccess.h>
 #include <linux/slab.h>
 
-#define TEST_MAJOR  234
+#define CHAR_DEV_MAJOR  234
 #define CHAR_DEV_NAME "my char dev"
 
-
-unsigned int char_test_major = TEST_MAJOR;
 
 MODULE_AUTHOR("Jianjun Wang");
 MODULE_LICENSE("GPL v2");
@@ -60,7 +58,7 @@ static int __init char_test_init(void)
 {
 	int ret;
 	printk("%s\n",__func__);
-	ret = register_chrdev(char_test_major,CHAR_DEV_NAME,&char_test_ops);
+	ret = register_chrdev(CHAR_DEV_MAJOR,CHAR_DEV_NAME,&char_test_ops);
 	if(ret){
 		printk("Can't register char device %d\n",char_test_major);
 		return ret;
@@ -71,7 +69,7 @@ module_init(char_test_init);
 
 static void __exit char_test_exit(void)
 {
-	unregister_chrdev(char_test_major,CHAR_DEV_NAME);
+	unregister_chrdev(CHAR_DEV_MAJOR,CHAR_DEV_NAME);
 	printk("%s\n",__func__);
 }
 module_exit(char_test_exit);
