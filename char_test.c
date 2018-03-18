@@ -50,23 +50,23 @@ typedef struct {
 	unsigned int GPIO_11 : 1;
 }pl_data;
 
-#define GPIOL_GREEN_CFG     (pl_cfg1 *)PL_CFG1->PL10_SELECT
-#define GPIOL_GREEN_DATA    (pl_data *)PL_DATA->GPIO_10
+#define GPIOL_GREEN_CFG     (pl_cfg1 *)ioremap(PL_CFG1,4)
+#define GPIOL_GREEN_DATA    (pl_data *)ioremap(PL_DATA,4)
 
 void light_init(void)
 {
-	GPIOL_GREEN_CFG = OUTPUT;
-	GPIOL_GREEN_DATA = LIGHT_OFF;
+	GPIOL_GREEN_CFG->PL10_SELECT = OUTPUT;
+	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_OFF;
 }
 
 void light_on(void)
 {
-	GPIOL_GREEN_DATA = LIGHT_ON;
+	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_ON;
 }
 
 void light_off(void)
 {
-	GPIOL_GREEN_DATA = LIGHT_OFF;
+	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_OFF;
 }
 
 ssize_t char_test_read(struct file *filp, char __user *buf, size_t count,
