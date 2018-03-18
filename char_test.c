@@ -4,6 +4,7 @@
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
+#include <linux/io.h>
 
 #define CHAR_DEV_MAJOR  234
 #define CHAR_DEV_NAME "my char dev"
@@ -17,11 +18,11 @@ MODULE_LICENSE("GPL v2");
 #define PL_DATA    (PIO_BASE + 0x10)
 
 enum IO_STATE{
-	INPUT;
-	OUTPUT;
-	S_PWM;
-	S_PL_EINT = 6;
-	IO_DISABLE;
+	INPUT,
+	OUTPUT,
+	S_PWM,
+	S_PL_EINT = 6,
+	IO_DISABLE,
 };
 enum LIGHT_STATE{LIGHT_OFF,LIGHT_ON};
 
@@ -50,11 +51,15 @@ typedef struct {
 	unsigned int GPIO_11 : 1;
 }pl_data;
 
-#define GPIOL_GREEN_CFG     (pl_cfg1 *)ioremap(PL_CFG1,4)
-#define GPIOL_GREEN_DATA    (pl_data *)ioremap(PL_DATA,4)
+pl_cfg1 *GPIOL_GREEN_CFG;
+pl_data *GPIOL_GREEN_DATA;
+//pl_cfg1 *GPIOL_GREEN_CFG = (pl_cfg1 *)ioremap(PL_CFG1,4)
+//pl_data *GPIOL_GREEN_DATA = (pl_data *)ioremap(PL_DATA,4)
 
 void light_init(void)
 {
+	GPIOL_GREEN_CFG = (pl_cfg1 *)ioremap(PL_CFG1,4);
+	GPIOL_GREEN_DATA = (pl_data *)ioremap(PL_DATA,4);
 	GPIOL_GREEN_CFG->PL10_SELECT = OUTPUT;
 	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_OFF;
 }
@@ -78,8 +83,8 @@ ssize_t char_test_read(struct file *filp, char __user *buf, size_t count,
 ssize_t char_test_write(struct file *filp, const char __user *buf, size_t count,
 	loff_t *f_pos)
 {
-	printk("%s\n",__func__);
 	char argv;
+	printk("%s\n",__func__);
 	if(copy_from_user(&argv,buf,count))
 		printk(KERN_INFO"Copy from user data ERROR!\n");
 	if(argv == '1')
@@ -121,6 +126,7 @@ static int __init char_test_init(void)
 {
 	int ret;
 	printk("%s\n",__func__);
+	light_init();
 	ret = register_chrdev(CHAR_DEV_MAJOR,CHAR_DEV_NAME,&char_test_ops);
 	if(ret){
 		printk("Can't register char device %d\n",CHAR_DEV_MAJOR);
