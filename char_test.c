@@ -27,28 +27,30 @@ enum IO_STATE{
 enum LIGHT_STATE{LIGHT_OFF,LIGHT_ON};
 
 typedef struct {
-	unsigned int PL8_SELECT  : 3;
-	unsigned int res0        : 1;
-	unsigned int PL9_SELECT  : 3;
-	unsigned int res1        : 1;
-	unsigned int PL10_SELECT : 3;
-	unsigned int res2        : 1;
-	unsigned int PL11_SELECT : 3;
+	volatile unsigned int PL8_SELECT  : 3;
+	volatile unsigned int res0        : 1;
+	volatile unsigned int PL9_SELECT  : 3;
+	volatile unsigned int res1        : 1;
+	volatile unsigned int PL10_SELECT : 3;
+	volatile unsigned int res2        : 1;
+	volatile unsigned int PL11_SELECT : 3;
+	volatile unsigned int res3        : 17;
 }pl_cfg1; 
 
 typedef struct {
-	unsigned int GPIO_0  : 1;
-	unsigned int GPIO_1  : 1;
-	unsigned int GPIO_2  : 1;
-	unsigned int GPIO_3  : 1;
-	unsigned int GPIO_4  : 1;
-	unsigned int GPIO_5  : 1;
-	unsigned int GPIO_6  : 1;
-	unsigned int GPIO_7  : 1;
-	unsigned int GPIO_8  : 1;
-	unsigned int GPIO_9  : 1;
-	unsigned int GPIO_10 : 1;
-	unsigned int GPIO_11 : 1;
+	volatile unsigned int GPIO_0  : 1;
+	volatile unsigned int GPIO_1  : 1;
+	volatile unsigned int GPIO_2  : 1;
+	volatile unsigned int GPIO_3  : 1;
+	volatile unsigned int GPIO_4  : 1;
+	volatile unsigned int GPIO_5  : 1;
+	volatile unsigned int GPIO_6  : 1;
+	volatile unsigned int GPIO_7  : 1;
+	volatile unsigned int GPIO_8  : 1;
+	volatile unsigned int GPIO_9  : 1;
+	volatile unsigned int GPIO_10 : 1;
+	volatile unsigned int GPIO_11 : 1;
+	volatile unsigned int res     : 20;
 }pl_data;
 
 pl_cfg1 *GPIOL_GREEN_CFG;
@@ -66,11 +68,13 @@ void light_init(void)
 
 void light_on(void)
 {
+	printk("%s\n",__func__);
 	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_ON;
 }
 
 void light_off(void)
 {
+	printk("%s\n",__func__);
 	GPIOL_GREEN_DATA->GPIO_10 = LIGHT_OFF;
 }
 
@@ -78,7 +82,9 @@ ssize_t char_test_read(struct file *filp, char __user *buf, size_t count,
 	loff_t *f_pos)
 {
 	printk("%s\n",__func__);
-	return count;
+	printk("GPIOL_GREEN_CFG = 0x%x\n",*(unsigned int *)GPIOL_GREEN_CFG);
+	printk("GPIOL_GREEN_DATA = 0x%x\n",*(unsigned int *)GPIOL_GREEN_DATA);
+	return 0;
 }
 ssize_t char_test_write(struct file *filp, const char __user *buf, size_t count,
 	loff_t *f_pos)
